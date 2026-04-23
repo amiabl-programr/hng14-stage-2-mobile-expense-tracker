@@ -2,11 +2,11 @@ import ScreenWrapper from '@components/common/ScreenWrapper'
 import { Colors } from '@constants/colors'
 import { StyleSheet, Text, View } from 'react-native'
 
-export default function FinancialInsightsScreen() {
+export default function SettingsProfileScreen() {
   return (
     <ScreenWrapper>
       <View style={styles.center}>
-        <Text style={styles.text}>Budgets Overview</Text>
+        <Text style={styles.text}>Settings Profile</Text>
       </View>
     </ScreenWrapper>
   )

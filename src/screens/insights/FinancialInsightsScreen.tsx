@@ -6,7 +6,7 @@ export default function FinancialInsightsScreen() {
   return (
     <ScreenWrapper>
       <View style={styles.center}>
-        <Text style={styles.text}>Budgets Overview</Text>
+        <Text style={styles.text}>Financial Insights</Text>
       </View>
     </ScreenWrapper>
   )

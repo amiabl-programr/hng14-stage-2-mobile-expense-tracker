@@ -6,7 +6,7 @@ export default function AddTransactionScreen() {
   return (
     <ScreenWrapper>
       <View style={styles.center}>
-        <Text style={styles.text}>Budgets Overview</Text>
+        <Text style={styles.text}>Add Transaction</Text>
       </View>
     </ScreenWrapper>
   )
