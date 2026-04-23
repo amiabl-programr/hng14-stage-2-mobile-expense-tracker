@@ -6,7 +6,7 @@ export default function SecurityGatewayScreen() {
   return (
     <ScreenWrapper>
       <View style={styles.center}>
-        <Text style={styles.text}>Budgets Overview</Text>
+        <Text style={styles.text}>Security Gateway</Text>
       </View>
     </ScreenWrapper>
   )
