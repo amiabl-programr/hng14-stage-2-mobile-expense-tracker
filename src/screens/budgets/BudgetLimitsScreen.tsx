@@ -6,7 +6,7 @@ export default function BudgetLimitsScreen() {
   return (
     <ScreenWrapper>
       <View style={styles.center}>
-        <Text style={styles.text}>Budgets Overview</Text>
+        <Text style={styles.text}>Budget Limits</Text>
       </View>
     </ScreenWrapper>
   )
