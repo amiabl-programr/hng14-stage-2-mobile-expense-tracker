@@ -1,18 +1,20 @@
-import ScreenWrapper from '@components/common/ScreenWrapper'
-import { Colors } from '@constants/colors'
-import { StyleSheet, Text, View } from 'react-native'
+import React, { useEffect } from 'react';
+import { Camera, useCameraPermission, usePhotoOutput } from 'react-native-vision-camera';
 
 export default function BiometricVerificationScreen() {
+  const { hasPermission, requestPermission } = useCameraPermission();
+  const photoOutput = usePhotoOutput();
+
+  useEffect(() => {
+    if (!hasPermission) requestPermission()
+  }, [hasPermission, requestPermission])
+
   return (
-    <ScreenWrapper>
-      <View style={styles.center}>
-        <Text style={styles.text}>Budgets Overview</Text>
-      </View>
-    </ScreenWrapper>
+    <Camera
+      style={{ flex: 1 }}
+      isActive={true}
+      device="front"
+      outputs={[photoOutput]}
+    />
   )
 }
-
-const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  text: { color: Colors.textSecondary },
-})
