@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AllocationListScreen from '@screens/budgets/AllocationListScreen';
 import CategoryList from "@screens/budgets/CategoryList";
 import useAuthStore from '@store/useAuthStore';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -43,6 +44,7 @@ export default function RootNavigator() {
           />
           <Stack.Screen name="AddCategoryScreen" component={AddCategoryScreen} />
           <Stack.Screen name="CategoryList" component={CategoryList} />
+          <Stack.Screen name="AllocationList" component={AllocationListScreen} />
         </>
                 
             ) : (

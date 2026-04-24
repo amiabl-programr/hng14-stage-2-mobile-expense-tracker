@@ -20,4 +20,5 @@ export type RootStackParamList = {
   BudgetSmartPrediction: undefined
   AddCategoryScreen: undefined
   CategoryList: undefined
+  AllocationList: undefined
 }

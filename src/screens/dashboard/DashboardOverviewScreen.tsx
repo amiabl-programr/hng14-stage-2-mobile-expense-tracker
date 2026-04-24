@@ -14,11 +14,11 @@ import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
 
 type Nav = NativeStackNavigationProp<RootStackParamList>
@@ -26,11 +26,11 @@ type Nav = NativeStackNavigationProp<RootStackParamList>
 // ─── Mock data (replace with store data later) ───────────────────────────────
 
 const MOCK_ALLOCATIONS: Allocation[] = [
-  { category: 'TRANSPORT', spent: 320, limit: 700, status: 'HEALTHY' },
-  { category: 'FOOD', spent: 485, limit: 500, status: 'AT_LIMIT' },
-  { category: 'SHOP', spent: 250, limit: 300, status: 'ON_TRACK' },
-  { category: 'UTILITIES', spent: 150, limit: 250, status: 'HEALTHY' },
-  { category: 'ENTERTAINMENT', spent: 200, limit: 300, status: 'HEALTHY' },
+  { id: '1', category: 'TRANSPORT', spent: 320, limit: 700, status: 'HEALTHY' },
+  { id: '2', category: 'FOOD', spent: 485, limit: 500, status: 'AT_LIMIT' },
+  { id: '3', category: 'SHOP', spent: 250, limit: 300, status: 'ON_TRACK' },
+  { id: '4', category: 'UTILITIES', spent: 150, limit: 250, status: 'HEALTHY' },
+  { id: '5', category: 'ENTERTAINMENT', spent: 200, limit: 300, status: 'HEALTHY' },
 ]
 
 const MOCK_CHART_DATA = [
@@ -122,7 +122,7 @@ export default function DashboardOverviewScreen() {
         <View style={styles.section}>
           <SectionHeader
             title="Allocations"
-            onViewAll={() => navigation.navigate('BudgetLimits')}
+            onViewAll={() => navigation.navigate('AllocationList')}
           />
         </View>
 

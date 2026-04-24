@@ -11,6 +11,7 @@ export interface Budget {
 }
 
 export interface Allocation {
+  id: string
   category: CategoryKey
   spent: number
   limit: number
