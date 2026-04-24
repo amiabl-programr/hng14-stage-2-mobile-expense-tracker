@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import useAuthStore from '@store/useAuthStore';
 import BudgetLimitsScreen from "../screens/budgets/BudgetLimitsScreen";
 import BudgetSmartPredictionScreen from "../screens/budgets/BudgetSmartPredictionScreen";
 import AddTransactionDetailsScreen from "../screens/ledger/AddTransactionDetailsScreen";
@@ -8,15 +9,16 @@ import { RootStackParamList } from "../types/navigation";
 import AppTabNavigator from "./AppTabNavigator";
 import AuthStackNavigator from "./AuthStackNavigator";
 
-// temporary — replace with useAuthStore once store is set up
-const IS_AUTHENTICATED = false;
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function RootNavigator() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  console.log(isAuthenticated);
+  
     return (
         <Stack.Navigator screenOptions={{headerShown: false}}>
            {
-            IS_AUTHENTICATED ? (
+            isAuthenticated ? (
                      <>
           <Stack.Screen name="App" component={AppTabNavigator} />
           <Stack.Screen

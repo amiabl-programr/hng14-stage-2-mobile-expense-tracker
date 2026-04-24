@@ -1,14 +1,16 @@
 import LivenessCameraView from "@components/auth/LivenessCameraView";
 import useLivenessVerification from "@hooks/useLivenessVerification";
+import useAuthStore from '@store/useAuthStore';
 
 export default function BiometricVerificationScreen() {
+  const setAuthenticated = useAuthStore((state) => state.setAuthenticated)
   const {
     step,
     instruction,
     isFaceObscured,
     retry,
   } = useLivenessVerification(() => {
-    // set auth on success
+    setAuthenticated(true);
   })
   return (
       <LivenessCameraView
