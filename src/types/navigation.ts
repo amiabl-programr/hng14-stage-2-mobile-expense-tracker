@@ -18,4 +18,6 @@ export type RootStackParamList = {
   Ledgers: undefined
   BudgetLimits: undefined
   BudgetSmartPrediction: undefined
+  AddCategoryScreen: undefined
+  CategoryList: undefined
 }

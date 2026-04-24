@@ -1,5 +1,8 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import CategoryList from "@screens/budgets/CategoryList";
 import useAuthStore from '@store/useAuthStore';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AddCategoryScreen from "../screens/budgets/AddCategory";
 import BudgetLimitsScreen from "../screens/budgets/BudgetLimitsScreen";
 import BudgetSmartPredictionScreen from "../screens/budgets/BudgetSmartPredictionScreen";
 import AddTransactionDetailsScreen from "../screens/ledger/AddTransactionDetailsScreen";
@@ -8,13 +11,11 @@ import LedgersScreen from "../screens/ledger/LedgersScreen";
 import { RootStackParamList } from "../types/navigation";
 import AppTabNavigator from "./AppTabNavigator";
 import AuthStackNavigator from "./AuthStackNavigator";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function RootNavigator() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  console.log(isAuthenticated);
   
     return (
       <SafeAreaProvider>
@@ -40,6 +41,8 @@ export default function RootNavigator() {
             name="BudgetSmartPrediction"
             component={BudgetSmartPredictionScreen}
           />
+          <Stack.Screen name="AddCategoryScreen" component={AddCategoryScreen} />
+          <Stack.Screen name="CategoryList" component={CategoryList} />
         </>
                 
             ) : (
