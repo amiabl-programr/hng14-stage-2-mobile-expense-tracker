@@ -1,4 +1,6 @@
+import { RootStackParamList } from '@/src/types/navigation';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
 import {
     KeyboardAvoidingView,
@@ -12,9 +14,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
 export default function AddCategoryScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [categoryName, setCategoryName] = useState('');
   const [notes, setNotes] = useState('');
   const [budget, setBudget] = useState('0.00');

@@ -1,3 +1,6 @@
+import { RootStackParamList } from '@/src/types/navigation';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React from 'react';
 import {
     ScrollView,
@@ -9,7 +12,17 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const CATEGORIES = [
+interface CategoryItems{
+    id: string
+    icon: string
+    name: string
+    spent: number
+    budget: number
+    left: number 
+    over: boolean
+}
+
+const CATEGORIES: CategoryItems[] = [
   { id: '1', icon: '🍴', name: 'Utilities',      spent: 150, budget: 250, left: 100,  over: true  },
   { id: '2', icon: '🎮', name: 'Entertainment',  spent: 200, budget: 300, left: 100,  over: false },
   { id: '3', icon: '🚗', name: 'Groceries',      spent: 250, budget: 325, left: 75,   over: false },
@@ -18,7 +31,7 @@ const CATEGORIES = [
   { id: '6', icon: '🚗', name: 'Clothing',       spent: 180, budget: 240, left: 60,   over: false },
 ];
 
-function CategoryCard({ item }) {
+function CategoryCard({ item }: { item: CategoryItems }) {
   const progress = Math.min(item.spent / (item.spent + item.left), 1);
   return (
     <View style={styles.card}>
@@ -45,7 +58,8 @@ function CategoryCard({ item }) {
   );
 }
 
-export default function CategoriesScreen({ navigation }) {
+export default function CategoriesScreen() {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar barStyle="dark-content" backgroundColor="#F2F4F7" />
