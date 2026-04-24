@@ -9,11 +9,13 @@ import DashboardOverviewScreen from '@screens/dashboard/DashboardOverviewScreen'
 import FinancialInsightsScreen from '@screens/insights/FinancialInsightsScreen'
 import SettingsProfileScreen from '@screens/settings/SettingsProfileScreen'
 import { StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
 export default function AppTabNavigator() {
     return (
+      <SafeAreaView style={{ flex: 1 }}>
         <Tab.Navigator
             screenOptions={({ route }) => ({
             headerShown: false,
@@ -37,6 +39,7 @@ export default function AppTabNavigator() {
             <Tab.Screen name="Insights" component={FinancialInsightsScreen} />
             <Tab.Screen name="Settings" component={SettingsProfileScreen} />
         </Tab.Navigator>
+      </SafeAreaView>
     )
 }
 

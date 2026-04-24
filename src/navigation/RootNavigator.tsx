@@ -8,6 +8,7 @@ import LedgersScreen from "../screens/ledger/LedgersScreen";
 import { RootStackParamList } from "../types/navigation";
 import AppTabNavigator from "./AppTabNavigator";
 import AuthStackNavigator from "./AuthStackNavigator";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -16,6 +17,8 @@ export default function RootNavigator() {
   console.log(isAuthenticated);
   
     return (
+      <SafeAreaProvider>
+        
         <Stack.Navigator screenOptions={{headerShown: false}}>
            {
             isAuthenticated ? (
@@ -44,5 +47,6 @@ export default function RootNavigator() {
             )
            }
         </Stack.Navigator>
+      </SafeAreaProvider>
     )
 }
