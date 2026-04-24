@@ -1,109 +1,89 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
-    LivenessChallenge,
-    evaluateChallenge,
-    getChallengeInstruction,
-    getRandomChallenge,
-    isFaceCentered,
+  LivenessChallenge,
+  VerificationStatus,
+  getChallengeInstruction,
+  getRandomChallenges,
 } from '@services/livenessService'
-import * as FaceDetector from 'expo-face-detector'
-import { useCallback, useRef, useState } from 'react'
 
-export type VerificationStep = 'POSITION_FACE' | 'CHALLENGE' | 'SYSTEM_CHECK' | 'SUCCESS' | 'FAILED'
-
-interface LivenessState {
-  step: VerificationStep
-  challenge: LivenessChallenge
-  instruction: string
-  isFaceDetected: boolean
-  isFaceObscured: boolean
-  isLightingOptimal: boolean
-  attemptCount: number
-}
-
+const POSITION_DURATION = 2000
+const CHALLENGE_DURATION = 3000
+const SYSTEM_CHECK_DURATION = 1500
 const MAX_ATTEMPTS = 3
 
 export default function useLivenessVerification(onSuccess: () => void) {
-  const challenge = useRef<LivenessChallenge>(getRandomChallenge())
-  const challengePassed = useRef(false)
+  const challenges = useRef<LivenessChallenge[]>(getRandomChallenges())
+  const challengeIndex = useRef(0)
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const attemptCount = useRef(0)
 
-  const [state, setState] = useState<LivenessState>({
-    step: 'POSITION_FACE',
-    challenge: challenge.current,
-    instruction: getChallengeInstruction(challenge.current),
-    isFaceDetected: false,
-    isFaceObscured: false,
-    isLightingOptimal: true,
-    attemptCount: 0,
-  })
-
-  const handleFacesDetected = useCallback(
-    ({ faces }: { faces: FaceDetector.FaceFeature[] }) => {
-      if (challengePassed.current) return
-
-      // No face detected
-      if (faces.length === 0) {
-        setState((prev) => ({
-          ...prev,
-          isFaceDetected: false,
-          isFaceObscured: false,
-        }))
-        return
-      }
-
-      const face = faces[0]
-      const centered = isFaceCentered(face)
-
-      setState((prev) => ({
-        ...prev,
-        isFaceDetected: true,
-        isFaceObscured: !centered,
-      }))
-
-      // Step 1 — wait for face to be centered before starting challenge
-      if (state.step === 'POSITION_FACE' && centered) {
-        setState((prev) => ({ ...prev, step: 'CHALLENGE' }))
-        return
-      }
-
-      // Step 2 — evaluate challenge
-      if (state.step === 'CHALLENGE' && centered) {
-        const passed = evaluateChallenge(face, challenge.current)
-        if (passed) {
-          challengePassed.current = true
-          setState((prev) => ({ ...prev, step: 'SYSTEM_CHECK' }))
-
-          // simulate system check then succeed
-          setTimeout(() => {
-            setState((prev) => ({ ...prev, step: 'SUCCESS' }))
-            setTimeout(onSuccess, 800)
-          }, 1500)
-        }
-      }
-    },
-    [state.step, onSuccess]
+  const [step, setStep] = useState<VerificationStatus>('POSITION_FACE')
+  const [currentChallenge, setCurrentChallenge] = useState<LivenessChallenge>(
+    challenges.current[0]
   )
+  const [instruction, setInstruction] = useState('Position your face in the frame')
+  const [isFaceObscured, setIsFaceObscured] = useState(false)
 
-  const retry = useCallback(() => {
-    if (state.attemptCount >= MAX_ATTEMPTS - 1) {
-      setState((prev) => ({ ...prev, step: 'FAILED' }))
+  const clearTimer = () => {
+    if (timerRef.current) clearTimeout(timerRef.current)
+  }
+
+  const runNextChallenge = useCallback(() => {
+    const idx = challengeIndex.current
+    if (idx >= challenges.current.length) {
+      setStep('SYSTEM_CHECK')
+      setInstruction('Verifying identity...')
+      timerRef.current = setTimeout(() => {
+        setStep('SUCCESS')
+        setTimeout(onSuccess, 600)
+      }, SYSTEM_CHECK_DURATION)
       return
     }
-    challengePassed.current = false
-    challenge.current = getRandomChallenge()
-    setState({
-      step: 'POSITION_FACE',
-      challenge: challenge.current,
-      instruction: getChallengeInstruction(challenge.current),
-      isFaceDetected: false,
-      isFaceObscured: false,
-      isLightingOptimal: true,
-      attemptCount: state.attemptCount + 1,
-    })
-  }, [state.attemptCount])
+
+    const challenge = challenges.current[idx]
+    setCurrentChallenge(challenge)
+    setInstruction(getChallengeInstruction(challenge))
+    setStep('CHALLENGE')
+
+    timerRef.current = setTimeout(() => {
+      challengeIndex.current += 1
+      runNextChallenge()
+    }, CHALLENGE_DURATION)
+  }, [onSuccess])
+
+  const start = useCallback(() => {
+    clearTimer()
+    challengeIndex.current = 0
+    challenges.current = getRandomChallenges()
+    setStep('POSITION_FACE')
+    setInstruction('Position your face in the frame')
+    setIsFaceObscured(false)
+
+    timerRef.current = setTimeout(() => {
+      runNextChallenge()
+    }, POSITION_DURATION)
+  }, [runNextChallenge])
+
+  const retry = useCallback(() => {
+    if (attemptCount.current >= MAX_ATTEMPTS - 1) {
+      setStep('FAILED')
+      setInstruction('Verification failed. Please try again later.')
+      return
+    }
+    attemptCount.current += 1
+    start()
+  }, [start])
+
+  useEffect(() => {
+    start()
+    return clearTimer
+  }, [])
 
   return {
-    ...state,
-    handleFacesDetected,
+    step,
+    currentChallenge,
+    instruction,
+    isFaceObscured,
     retry,
   }
 }

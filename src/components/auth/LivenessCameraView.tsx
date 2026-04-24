@@ -2,75 +2,43 @@ import { Colors } from '@constants/colors'
 import { Spacing } from '@constants/spacing'
 import { Typography } from '@constants/typography'
 import { Ionicons } from '@expo/vector-icons'
-import { VerificationStep } from '@hooks/useLivenessVerification'
-import { FACE_DETECTOR_OPTIONS } from '@services/livenessService'
-import { CameraView } from 'expo-camera'
-import * as FaceDetector from 'expo-face-detector'
-import { useEffect, useRef } from 'react'
+import { VerificationStatus } from '@services/livenessService'
 import { StyleSheet, Text, View } from 'react-native'
+import { Camera, useCameraDevice } from 'react-native-vision-camera'
 
 interface Props {
-  onFacesDetected: (result: { faces: FaceDetector.FaceFeature[] }) => void
   instruction: string
   isFaceObscured: boolean
   isLightingOptimal: boolean
-  step: VerificationStep
+  step: VerificationStatus
 }
 
 export default function LivenessCameraView({
-  onFacesDetected,
   instruction,
   isFaceObscured,
   isLightingOptimal,
   step,
 }: Props) {
-  const cameraRef = useRef<CameraView>(null)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const isProcessing = useRef(false)
+  const device = useCameraDevice('front')
 
-  useEffect(() => {
-    // Poll every 300ms — take a picture and run face detection on it
-    intervalRef.current = setInterval(async () => {
-      if (!cameraRef.current || isProcessing.current) return
-      isProcessing.current = true
-
-      try {
-        const photo = await cameraRef.current.takePictureAsync({
-          quality: 0.9,        // low quality — we only need face data, not a real photo
-          base64: false,
-          skipProcessing: true,
-        })
-
-        if (!photo?.uri) return
-
-        const result = await FaceDetector.detectFacesAsync(
-          photo.uri,
-          FACE_DETECTOR_OPTIONS
-        )
-
-        onFacesDetected({ faces: result.faces })
-      } catch {
-        // camera not ready yet — ignore
-      } finally {
-        isProcessing.current = false
-      }
-    }, 300)
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [onFacesDetected])
+  if (!device) {
+    return (
+      <View style={[styles.wrapper, styles.noCamera]}>
+        <Ionicons name="camera-outline" size={40} color={Colors.textMuted} />
+        <Text style={styles.noCameraText}>Camera unavailable</Text>
+      </View>
+    )
+  }
 
   return (
     <View style={styles.wrapper}>
-      {/* Camera preview */}
-      <CameraView
-        ref={cameraRef}
+      <Camera
         style={StyleSheet.absoluteFill}
-        facing="front"
+        device={device}
+        isActive={true}
       />
 
-      {/* Corner frame overlay */}
+      {/* Corner frame */}
       <View style={styles.frameWrapper} pointerEvents="none">
         <View style={[styles.corner, styles.topLeft]} />
         <View style={[styles.corner, styles.topRight]} />
@@ -107,10 +75,22 @@ export default function LivenessCameraView({
       </View>
 
       {/* Instruction pill */}
-      {step === 'CHALLENGE' && (
+      {(step === 'CHALLENGE' || step === 'POSITION_FACE') && (
         <View style={styles.instructionPill} pointerEvents="none">
-          <Ionicons name="eye" size={16} color={Colors.navy} />
+          <Ionicons
+            name={step === 'POSITION_FACE' ? 'person-outline' : 'eye'}
+            size={16}
+            color={Colors.navy}
+          />
           <Text style={styles.instructionText}>{instruction}</Text>
+        </View>
+      )}
+
+      {/* System check overlay */}
+      {step === 'SYSTEM_CHECK' && (
+        <View style={styles.systemCheckOverlay} pointerEvents="none">
+          <Ionicons name="shield-checkmark" size={40} color={Colors.white} />
+          <Text style={styles.systemCheckText}>Verifying...</Text>
         </View>
       )}
     </View>
@@ -127,6 +107,15 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: Colors.textPrimary,
+  },
+  noCamera: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  noCameraText: {
+    fontSize: Typography.sizes.base,
+    color: Colors.textMuted,
   },
   frameWrapper: {
     position: 'absolute',
@@ -210,5 +199,17 @@ const styles = StyleSheet.create({
     fontSize: Typography.sizes.lg,
     fontWeight: Typography.weights.bold,
     color: Colors.navy,
+  },
+  systemCheckOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(13,33,89,0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: Spacing.md,
+  },
+  systemCheckText: {
+    fontSize: Typography.sizes.xl,
+    fontWeight: Typography.weights.bold,
+    color: Colors.white,
   },
 })

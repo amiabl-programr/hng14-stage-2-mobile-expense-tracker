@@ -1,20 +1,22 @@
-import React, { useEffect } from 'react';
-import { Camera, useCameraPermission, usePhotoOutput } from 'react-native-vision-camera';
+import LivenessCameraView from "@components/auth/LivenessCameraView";
+import useLivenessVerification from "@hooks/useLivenessVerification";
 
 export default function BiometricVerificationScreen() {
-  const { hasPermission, requestPermission } = useCameraPermission();
-  const photoOutput = usePhotoOutput();
-
-  useEffect(() => {
-    if (!hasPermission) requestPermission()
-  }, [hasPermission, requestPermission])
-
+  const {
+    step,
+    instruction,
+    isFaceObscured,
+    retry,
+  } = useLivenessVerification(() => {
+    // set auth on success
+  })
   return (
-    <Camera
-      style={{ flex: 1 }}
-      isActive={true}
-      device="front"
-      outputs={[photoOutput]}
-    />
+      <LivenessCameraView
+        instruction={instruction}
+        isFaceObscured={isFaceObscured}
+        isLightingOptimal={true}
+        step={step}
+      />
+
   )
 }
